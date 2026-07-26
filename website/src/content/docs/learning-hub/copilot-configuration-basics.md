@@ -3,12 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
-estimatedReadingTime: '10 minutes'
-tags:
-  - configuration
-  - setup
-  - fundamentals
+lastUpdated: 2026-07-26
 relatedArticles:
   - ./what-are-agents-skills-instructions.md
   - ./understanding-copilot-context.md
@@ -223,7 +218,7 @@ The `~/.agents/skills/` path aligns with the VS Code GitHub Copilot for Azure ex
 
 | Field | Description | Example values |
 |-------|-------------|----------------|
-| `model` | The AI model to use for this repository | `"claude-sonnet-4"`, `"gpt-4.1"`, `"claude-sonnet-5"` |
+| `model` | The AI model to use for this repository | `"claude-sonnet-4"`, `"gpt-4.1"`, `"claude-sonnet-5"`, `"claude-opus-5"`, `"gemini-3.6-flash"` |
 | `effortLevel` | Reasoning effort level | `"low"`, `"medium"`, `"high"` |
 | `contextTier` | How much context to include | `"default"`, `"full"` |
 
@@ -449,6 +444,25 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
 
+**Per-session model override** (v1.0.72+): Use `/model --session` (or `/model -s`) to change the model, reasoning effort, or context window for just the current session, without affecting your saved global settings. This is useful when you want to try a different model for one task without committing to a permanent change:
+
+```
+/model --session                # open picker to change model for this session only
+/model -s claude-opus-5         # switch directly to Claude Opus 5 for this session
+```
+
+The session model reverts to your global setting when you start a new session.
+
+**Plan mode model** (v1.0.74+): Use `/model plan` (or `/model --plan`) to pick a dedicated model for plan mode — the model used while the agent is proposing without executing. Pass a model ID to set it, `off` to clear it, or no argument to open the interactive picker. When you leave plan mode, the session reverts to the regular session model:
+
+```
+/model plan                     # open picker to choose plan mode model
+/model plan claude-haiku-4.5    # use a faster model for planning
+/model --plan off               # clear the plan mode model override
+```
+
+This lets you use a cheaper, faster model during the planning phase and a more capable model for execution.
+
 ### CLI Session Commands
 
 The `/settings` command (v1.0.61+) opens an interactive dialog to browse and edit all user settings in one place. Use it to discover available settings, toggle options, and update values without manually editing your config file:
@@ -630,6 +644,8 @@ Use `/diagnose` when a session is behaving unexpectedly — it inspects session 
 **Background running tasks**: Press **Ctrl+X → B** to move the current running task or shell command to the background. The task continues executing while you can type a new message or review earlier output. This is useful for long-running commands where you want to interact with the agent while waiting for the result.
 
 **Shell command history in normal mode** (v1.0.65+): The **↑/↓** arrow keys and **Ctrl+R** reverse search now include past shell commands (commands run with `!`) while you are in normal (non-shell) input mode. Previously you had to type `!` to enter shell mode before history worked. Now you can recall and re-run a shell command without switching modes first — useful for quickly repeating a build, test, or diagnostic command from earlier in the session.
+
+**Interactive shell shortcut** (v1.0.72+): Type `$` at an empty prompt to instantly open an interactive shell in the current session directory — no need to type `!` or switch modes first. Enable it with `/settings shellShortcut on` (off by default). The shortcut opens a shell even while the agent is working, so you can run a quick command without interrupting an ongoing task.
 
 **Inline image rendering** (v1.0.64+): The CLI can display images inline in the terminal when your terminal supports it. If an MCP tool, agent, or attachment returns an image, it is rendered directly in the conversation timeline rather than shown as a file path or URL. This works in terminals with image protocol support (such as iTerm2, Kitty, Wezterm, and tmux with appropriate configuration).
 

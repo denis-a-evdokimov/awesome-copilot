@@ -3,12 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
-estimatedReadingTime: '8 minutes'
-tags:
-  - plugins
-  - copilot-cli
-  - fundamentals
+lastUpdated: 2026-07-26
 relatedArticles:
   - ./building-custom-agents.md
   - ./creating-effective-skills.md
@@ -73,6 +68,8 @@ The `plugin.json` manifest declares what the plugin contains:
   ]
 }
 ```
+
+**Open Plugin Spec v1 support** (v1.0.74+): In addition to the Awesome Copilot `plugin.json` format, the CLI now supports **Open Plugin Spec v1** plugin manifests and `mcp.json` configuration files. This means you can install plugins authored in the emerging cross-tool standard, not just the Awesome Copilot format. When the CLI finds an OPS v1 manifest alongside (or instead of) a `plugin.json`, it reads the metadata and MCP server definitions from it automatically.
 
 ## Why Use Plugins?
 
