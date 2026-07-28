@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-07-28
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -428,7 +428,7 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
 | `proxy` | HTTP(S) proxy URL for all outbound CLI requests (e.g., `http://proxy.example.com:8080`) (v1.0.64+) |
 | `sessionLimits` | Restrict credit or turn usage for a session; limits apply across the current conversation and reset on `/clear` (v1.0.66+) |
-| `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes, instead of returning to interactive mode (v1.0.69+) |
+| `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes. As of v1.0.76, this is **on by default** — set `stayInAutopilot: false` to return to interactive mode after each task. (v1.0.69+) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -448,6 +448,18 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 **Auto mode and server-side model routing** (v1.0.43+): When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
+
+**Plan mode model** *(v1.0.74+)*: Use `/model plan` (or `/model --plan`) to select a dedicated model that is used only while in plan mode. Pass a model ID to set it, `off` to clear it, or no argument to open the picker:
+
+```
+/model plan                    # open the model picker for plan mode
+/model plan claude-opus-5      # set Claude Opus 5 for plan mode
+/model --plan off              # clear the plan-mode model (reverts to session model)
+```
+
+This lets you use a more powerful reasoning model for planning passes while keeping a faster model for implementation turns. The plan-mode model automatically reverts to the session model when you leave plan mode.
+
+**Recently added models**: Claude Opus 5 (v1.0.75) and Gemini 3.6 Flash (v1.0.74) are now available in the model picker.
 
 ### CLI Session Commands
 
@@ -664,6 +676,14 @@ The `/usage` command displays session metrics such as the number of tokens consu
 ```
 /usage
 ```
+
+The `/limits predict` command *(v1.0.76+)* suggests a session AI-credit limit based on similar past sessions. It analyzes your session history to recommend an appropriate credit budget for the current task, which helps prevent runaway credit consumption without manually guessing at a limit:
+
+```
+/limits predict
+```
+
+After reviewing the suggestion, you can set the recommended limit with `/settings` or via the `sessionLimits` configuration key to cap the current or future sessions automatically.
 
 The `/compact` command summarizes the conversation history to free up context window space while preserving the thread of the conversation. Use it when your context is getting full but you do not want to start a fresh session:
 
